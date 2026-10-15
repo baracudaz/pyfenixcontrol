@@ -1,0 +1,49 @@
+name: Release
+
+# Publishing a GitHub release tagged vX.Y.Z builds the package and uploads it
+# to PyPI via trusted publishing (no API token stored in the repository).
+# One-time setup on PyPI: add this repository + workflow "release.yml" +
+# environment "pypi" as a trusted publisher of the project.
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.13"
+      - name: Check tag matches package version
+        run: |
+          version=$(uv run --no-sync python -c "import re,pathlib;print(re.search(r'__version__ = \"(.+?)\"', pathlib.Path('src/pyfenixcontrol/__init__.py').read_text()).group(1))")
+          test "v${version}" = "${GITHUB_REF_NAME}" || { echo "Tag ${GITHUB_REF_NAME} != v${version}"; exit 1; }
+      - run: uv sync --locked
+      - run: uv run pytest
+      - run: uv build
+      - run: uvx twine check --strict dist/*
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/pyfenixcontrol/
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1

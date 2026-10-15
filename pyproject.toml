@@ -1,0 +1,87 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pyfenixcontrol"
+dynamic = ["version"]
+description = "Asynchronous Python client for the FENIX Control cloud API (FENIX TFT WiFi thermostats)."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.12"
+authors = [{ name = "Stanislav Likavčan", email = "likavcan@gmail.com" }]
+keywords = ["fenix", "fenix control", "tft", "thermostat", "home assistant", "asyncio"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Framework :: AsyncIO",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Home Automation",
+    "Typing :: Typed",
+]
+dependencies = ["aiohttp>=3.9.0"]
+
+[project.urls]
+Homepage = "https://github.com/baracudaz/pyfenixcontrol"
+Source = "https://github.com/baracudaz/pyfenixcontrol"
+Issues = "https://github.com/baracudaz/pyfenixcontrol/issues"
+Changelog = "https://github.com/baracudaz/pyfenixcontrol/blob/main/CHANGELOG.md"
+
+[dependency-groups]
+dev = [
+    "mypy>=1.11",
+    "pytest>=8.0",
+    "pytest-asyncio>=0.24",
+    "pytest-cov>=5.0",
+    "ruff>=0.6",
+]
+
+[tool.hatch.version]
+path = "src/pyfenixcontrol/__init__.py"
+
+[tool.hatch.build.targets.sdist]
+include = ["src/pyfenixcontrol", "tests", "README.md", "CHANGELOG.md", "LICENSE"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]
+addopts = "--strict-markers"
+
+[tool.coverage.run]
+source = ["pyfenixcontrol"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+exclude_also = ["if TYPE_CHECKING:", "@abstractmethod", "raise NotImplementedError"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_unreachable = true
+files = ["src", "tests"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 88
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "COM812",  # conflicts with formatter
+    "D203",    # incompatible with D211
+    "D213",    # incompatible with D212
+    "PLR0913", # API methods legitimately take many arguments
+    "CPY001",  # license is declared once in LICENSE
+    "ANN401",  # JSON payloads are genuinely untyped at the API boundary
+    "B027",    # AbstractAuth.async_invalidate_access_token is an optional hook
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "S105", "PLR2004", "SLF001", "D", "FBT001", "DTZ001", "TC001", "TC003"]
