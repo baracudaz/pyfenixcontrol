@@ -4,6 +4,11 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Changed
+- README: clarify relationship with FENIX Trading s.r.o.
+
 ## [0.1.0] - 2026-10-15
 
 First release, extracted from the `api.py` module of the

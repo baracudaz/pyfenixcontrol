@@ -115,5 +115,8 @@ tagged `vX.Y.Z`. The release workflow publishes to PyPI via trusted publishing.
 
 ## License
 
-MIT – see [LICENSE](LICENSE). Not an official product of FENIX Trading s.r.o.
-unless stated otherwise in the project metadata.
+MIT – see [LICENSE](LICENSE).
+
+Developed in cooperation with FENIX Trading s.r.o. FENIX and FENIX Control are
+trademarks of their respective owners. The FENIX Control cloud is operated by the
+manufacturer; its API may change without notice.
