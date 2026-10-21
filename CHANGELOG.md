@@ -6,6 +6,10 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+- `Device.floor_temperature` is read from `ft`; it was read from `bo`, which
+  holds a different value.
+
 ### Changed
 - README: clarify relationship with FENIX Trading s.r.o.
 
