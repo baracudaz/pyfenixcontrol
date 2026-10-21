@@ -124,7 +124,7 @@ class Device:
       holiday mode it carries the holiday mode instead
     * ``H1``/``H2`` - holiday start/end, ``H3[0]`` - scheduled holiday mode,
       ``H4`` - currently active holiday mode (primary holiday indicator)
-    * ``Ma`` - target, ``At`` - room, ``bo`` - floor, ``Sp`` - holiday target
+    * ``Ma`` - target, ``At`` - room, ``ft`` - floor, ``Sp`` - holiday target
       temperature
     """
 
@@ -169,7 +169,7 @@ class Device:
             model=None if _prop(props, "Ty") is None else str(_prop(props, "Ty")),
             target_temperature=decode_temperature(props.get("Ma")),
             room_temperature=decode_temperature(props.get("At")),
-            floor_temperature=decode_temperature(props.get("bo")),
+            floor_temperature=decode_temperature(props.get("ft")),
             holiday_target_temperature=decode_temperature(props.get("Sp")),
             preset_mode=_as_int(_prop(props, "Cm")),
             hvac_state=_as_int(_prop(props, "Hs")),
