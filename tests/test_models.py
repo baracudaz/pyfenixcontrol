@@ -88,7 +88,8 @@ def test_device_from_api_full() -> None:
         "Ty": {"value": 7},
         "Ma": _entry(707),
         "At": _entry(680),
-        "bo": _entry(770),
+        "ft": _entry(770),
+        "bo": _entry(716),
         "Sp": _entry(500),
         "Cm": {"value": 1},
         "Hs": {"value": 2},
@@ -139,6 +140,24 @@ def test_device_from_api_sparse() -> None:
     assert device.active_holiday_mode == 0
     assert not device.holiday_active
     assert device.holiday_end_date is None
+
+
+@pytest.mark.parametrize(
+    ("props", "expected"),
+    [
+        ({"ft": _entry(770)}, 25.0),
+        ({}, None),
+        ({"bo": _entry(716)}, None),
+    ],
+    ids=["ft-present", "ft-missing", "bo-without-ft"],
+)
+def test_device_floor_temperature(
+    props: dict[str, object], expected: float | None
+) -> None:
+    """Floor temperature only comes from ft; bo is the boost setpoint."""
+    inst = Installation.from_api(INSTALLATION_JSON)
+    device = Device.from_api("dev-1", props, inst, inst.rooms[0])
+    assert device.floor_temperature == pytest.approx(expected)
 
 
 def test_energy_metric_from_api() -> None:
