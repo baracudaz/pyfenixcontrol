@@ -29,6 +29,27 @@ def decode_temperature(entry: Mapping[str, Any] | None) -> float | None:
     return (fahrenheit - 32.0) * 5.0 / 9.0
 
 
+def _decode_setpoint(entry: Mapping[str, Any] | None) -> float | None:
+    """Decode a setpoint, ``None`` for placeholder values outside its range.
+
+    Thermostats in off mode report placeholder setpoints (raw 0 on TFT
+    thermostats, 32767 on the WiFi Box) that lie outside the ``min``/``max``
+    range the entry carries.
+    """
+    if not entry:
+        return None
+    value = entry.get("value")
+    if value in (0, 32767):
+        return None
+    low, high = entry.get("min"), entry.get("max")
+    if isinstance(value, int | float) and (
+        (isinstance(low, int | float) and value < low)
+        or (isinstance(high, int | float) and value > high)
+    ):
+        return None
+    return decode_temperature(entry)
+
+
 def encode_temperature(celsius: float, div_factor: int = DEFAULT_DIV_FACTOR) -> int:
     """Encode °C to the raw API value (°F x divFactor, rounded)."""
     return round((celsius * 9.0 / 5.0 + 32.0) * div_factor)
@@ -129,8 +150,8 @@ class Device:
       holiday mode it carries the holiday mode instead
     * ``H1``/``H2`` - holiday start/end, ``H3[0]`` - scheduled holiday mode,
       ``H4`` - currently active holiday mode (primary holiday indicator)
-    * ``Ma`` - target, ``At`` - room, ``ft`` - floor, ``Sp`` - holiday target
-      temperature
+    * ``Ma`` - target, ``At`` - room, ``ft`` - floor, ``Sp`` - active setpoint
+      (also during a holiday)
     """
 
     id: str
@@ -151,6 +172,10 @@ class Device:
     holiday_mode: int
     active_holiday_mode: int
     raw: Mapping[str, Any] = field(repr=False, compare=False)
+    #: Setpoint the thermostat currently regulates to (``Sp``): the manual
+    #: target, the program setpoint, the Defrost or Boost setpoint or the
+    #: holiday setpoint. ``None`` in off mode.
+    active_target_temperature: float | None = None
 
     @classmethod
     def from_api(
@@ -183,6 +208,7 @@ class Device:
             holiday_mode=holiday_mode or 0,
             active_holiday_mode=_as_int(_prop(props, "H4")) or 0,
             raw=props,
+            active_target_temperature=_decode_setpoint(props.get("Sp")),
         )
 
     @property
