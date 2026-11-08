@@ -6,6 +6,12 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-08
+
+### Added
+- `Device.model_name`: product name of the device type (`Ty`): TFT Wi-Fi (P07542),
+  TFT Wi-Fi RF (P08639), WiFi Box (P08681); `None` for unknown types.
+
 ## [0.1.1] - 2026-11-08
 
 ### Fixed

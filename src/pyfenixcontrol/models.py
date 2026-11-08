@@ -6,7 +6,12 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any
 
-from .const import DEFAULT_DIV_FACTOR, HOLIDAY_DATE_FORMAT, HOLIDAY_EPOCH_DATE
+from .const import (
+    DEFAULT_DIV_FACTOR,
+    DEVICE_MODEL_NAMES,
+    HOLIDAY_DATE_FORMAT,
+    HOLIDAY_EPOCH_DATE,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -179,6 +184,11 @@ class Device:
             active_holiday_mode=_as_int(_prop(props, "H4")) or 0,
             raw=props,
         )
+
+    @property
+    def model_name(self) -> str | None:
+        """Product name of the device type (``Ty``), ``None`` if unknown."""
+        return DEVICE_MODEL_NAMES.get(self.model) if self.model else None
 
     @property
     def holiday_end_date(self) -> datetime | None:

@@ -160,6 +160,24 @@ def test_device_floor_temperature(
     assert device.floor_temperature == pytest.approx(expected)
 
 
+@pytest.mark.parametrize(
+    ("device_type", "expected"),
+    [
+        ("P07542", "TFT Wi-Fi"),
+        ("P08639", "TFT Wi-Fi RF"),
+        ("P08681", "WiFi Box"),
+        ("P99999", None),
+        (None, None),
+    ],
+)
+def test_device_model_name(device_type: str | None, expected: str | None) -> None:
+    """Known device types get their product name."""
+    inst = Installation.from_api(INSTALLATION_JSON)
+    props = {} if device_type is None else {"Ty": {"value": device_type}}
+    device = Device.from_api("dev-1", props, inst, inst.rooms[0])
+    assert device.model_name == expected
+
+
 def test_energy_metric_from_api() -> None:
     metric = EnergyMetric.from_api(
         {
