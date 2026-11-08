@@ -50,6 +50,18 @@ def _decode_setpoint(entry: Mapping[str, Any] | None) -> float | None:
     return decode_temperature(entry)
 
 
+def _decode_range(entry: Mapping[str, Any] | None) -> tuple[float, float] | None:
+    """Decode the ``min``/``max`` of a setpoint entry to °C, ``None`` if missing."""
+    if not entry:
+        return None
+    div = entry.get("divFactor")
+    low = decode_temperature({"value": entry.get("min"), "divFactor": div})
+    high = decode_temperature({"value": entry.get("max"), "divFactor": div})
+    if low is None or high is None or low > high:
+        return None
+    return (low, high)
+
+
 def encode_temperature(celsius: float, div_factor: int = DEFAULT_DIV_FACTOR) -> int:
     """Encode °C to the raw API value (°F x divFactor, rounded)."""
     return round((celsius * 9.0 / 5.0 + 32.0) * div_factor)
@@ -151,7 +163,7 @@ class Device:
     * ``H1``/``H2`` - holiday start/end, ``H3[0]`` - scheduled holiday mode,
       ``H4`` - currently active holiday mode (primary holiday indicator)
     * ``Ma`` - target, ``At`` - room, ``ft`` - floor, ``Sp`` - active setpoint
-      (also during a holiday)
+      (also during a holiday), ``df`` - Defrost setpoint, ``bo`` - Boost setpoint
     """
 
     id: str
@@ -176,6 +188,16 @@ class Device:
     #: target, the program setpoint, the Defrost or Boost setpoint or the
     #: holiday setpoint. ``None`` in off mode.
     active_target_temperature: float | None = None
+    #: Frost protection setpoint used in Defrost mode (``df``).
+    defrost_temperature: float | None = None
+    #: Setpoint used in Boost mode (``bo``).
+    boost_temperature: float | None = None
+    #: Range (°C) the device accepts for the manual target (``Ma``).
+    target_temperature_range: tuple[float, float] | None = None
+    #: Range (°C) the device accepts for the Defrost setpoint (``df``).
+    defrost_temperature_range: tuple[float, float] | None = None
+    #: Range (°C) the device accepts for the Boost setpoint (``bo``).
+    boost_temperature_range: tuple[float, float] | None = None
 
     @classmethod
     def from_api(
@@ -209,6 +231,11 @@ class Device:
             active_holiday_mode=_as_int(_prop(props, "H4")) or 0,
             raw=props,
             active_target_temperature=_decode_setpoint(props.get("Sp")),
+            defrost_temperature=_decode_setpoint(props.get("df")),
+            boost_temperature=_decode_setpoint(props.get("bo")),
+            target_temperature_range=_decode_range(props.get("Ma")),
+            defrost_temperature_range=_decode_range(props.get("df")),
+            boost_temperature_range=_decode_range(props.get("bo")),
         )
 
     @property

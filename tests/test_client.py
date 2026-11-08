@@ -292,6 +292,46 @@ async def test_set_target_temperature(
     }
 
 
+@pytest.mark.parametrize(
+    ("mode", "code", "raw"),
+    [
+        (PresetMode.MANUAL, "Ma", 680),
+        (PresetMode.DEFROST, "df", 464),  # 8.0 °C
+        (PresetMode.BOOST, "bo", 734),  # 23.0 °C
+    ],
+)
+async def test_set_setpoint(
+    client: FenixControlClient,
+    cloud: FakeCloud,
+    mode: PresetMode,
+    code: str,
+    raw: int,
+) -> None:
+    """The mode is written together with that mode's setpoint."""
+    cloud.add("PUT", CONFIG_PATH, status=204)
+    celsius = {680: 20.0, 464: 8.0, 734: 23.0}[raw]
+    await client.set_setpoint("dev-1", mode, celsius)
+    [req] = cloud.requests
+    assert req.json == {
+        "Id_deviceId": "dev-1",
+        "S1": "dev-1",
+        "configurationVersion": "v1.0",
+        "data": [
+            {"wattsType": "Dm", "wattsTypeValue": int(mode)},
+            {"wattsType": code, "wattsTypeValue": raw},
+        ],
+    }
+
+
+@pytest.mark.parametrize("mode", [PresetMode.PROGRAM, PresetMode.OFF, 3])
+async def test_set_setpoint_rejects_mode_without_setpoint(
+    client: FenixControlClient, cloud: FakeCloud, mode: int
+) -> None:
+    with pytest.raises(ValueError, match="without a setpoint"):
+        await client.set_setpoint("dev-1", mode, 20.0)
+    assert not cloud.requests
+
+
 async def test_set_preset_mode(client: FenixControlClient, cloud: FakeCloud) -> None:
     cloud.add("PUT", CONFIG_PATH, status=204)
     await client.set_preset_mode("dev-1", PresetMode.PROGRAM)

@@ -6,6 +6,21 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-11-08
+
+### Added
+- `Device.defrost_temperature` (`df`) and `Device.boost_temperature` (`bo`): the
+  setpoints the thermostat uses in Defrost and Boost mode; `None` if missing or
+  outside the property's range.
+- `Device.target_temperature_range`, `Device.defrost_temperature_range` and
+  `Device.boost_temperature_range`: the `(min, max)` range in °C the device reports
+  for `Ma`, `df` and `bo` (for example 2–15 °C for frost protection on TFT
+  thermostats, 10–30 °C for the WiFi Box's manual target). The cloud doesn't
+  enforce these ranges.
+- `FenixControlClient.set_setpoint(device_id, mode, celsius)`: switch to manual,
+  Defrost or Boost and set that mode's setpoint. `set_target_temperature` is now
+  `set_setpoint` with manual mode (same request as before).
+
 ## [0.3.0] - 2026-11-08
 
 ### Added
