@@ -53,6 +53,14 @@ class PresetMode(IntEnum):
     MANUAL = 6
 
 
+#: Device property holding the setpoint of each mode that has one.
+SETPOINT_CODES: dict[PresetMode, str] = {
+    PresetMode.MANUAL: "Ma",
+    PresetMode.DEFROST: "df",
+    PresetMode.BOOST: "bo",
+}
+
+
 class HvacState(IntEnum):
     """Heating state reported in ``Hs`` outside holiday mode."""
 

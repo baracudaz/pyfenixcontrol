@@ -43,6 +43,8 @@ def _entry(value: object, div: int = 10) -> dict[str, object]:
         ({"value": None}, None),
         ({"value": True}, None),
         ({"value": "68"}, None),
+        ({"value": 680, "divFactor": "10"}, None),  # malformed divFactor
+        ({"value": 680, "divFactor": True}, None),
     ],
 )
 def test_decode_temperature(
@@ -198,6 +200,51 @@ def test_device_active_target_temperature(
     props = {} if entry is None else {"Sp": entry}
     device = Device.from_api("dev-1", props, inst, inst.rooms[0])
     assert device.active_target_temperature == pytest.approx(expected)
+
+
+def test_device_defrost_and_boost_temperature() -> None:
+    """Defrost (df) and Boost (bo) setpoints are read with their own range."""
+    inst = Installation.from_api(INSTALLATION_JSON)
+    props = {
+        "df": {"value": 446, "divFactor": 10, "min": 355, "max": 590},
+        "bo": {"value": 752, "divFactor": 10, "min": 410, "max": 950},
+    }
+    device = Device.from_api("dev-1", props, inst, inst.rooms[0])
+    assert device.defrost_temperature == pytest.approx(7.0)
+    assert device.boost_temperature == pytest.approx(24.0)
+
+    assert device.defrost_temperature_range == pytest.approx(
+        ((35.5 - 32) * 5 / 9, 15.0)
+    )
+    assert device.boost_temperature_range == pytest.approx((5.0, 35.0))
+
+    empty = Device.from_api("dev-1", {}, inst, inst.rooms[0])
+    assert empty.defrost_temperature is None
+    assert empty.boost_temperature is None
+    assert empty.target_temperature_range is None
+    assert empty.defrost_temperature_range is None
+
+
+@pytest.mark.parametrize(
+    ("entry", "expected"),
+    [
+        ({"value": 680, "divFactor": 10, "min": 500, "max": 860}, (10.0, 30.0)),
+        ({"value": 680, "divFactor": 10, "min": 500}, None),
+        ({"value": 680, "divFactor": 10, "min": 860, "max": 500}, None),
+        ({"value": 680, "divFactor": 10, "min": "x", "max": 860}, None),
+        ({"value": 680, "divFactor": "10", "min": 500, "max": 860}, None),
+    ],
+)
+def test_device_target_temperature_range(
+    entry: dict[str, object], expected: tuple[float, float] | None
+) -> None:
+    """The setpoint range comes from the entry's min/max (WiFi Box: 10-30 °C)."""
+    inst = Installation.from_api(INSTALLATION_JSON)
+    device = Device.from_api("dev-1", {"Ma": entry}, inst, inst.rooms[0])
+    if expected is None:
+        assert device.target_temperature_range is None
+    else:
+        assert device.target_temperature_range == pytest.approx(expected)
 
 
 def test_energy_metric_from_api() -> None:

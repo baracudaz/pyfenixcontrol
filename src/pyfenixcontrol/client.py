@@ -16,6 +16,7 @@ from .const import (
     DEFAULT_REQUEST_TIMEOUT,
     HOLIDAY_EPOCH_DATE,
     IDENTITY_BASE_URL,
+    SETPOINT_CODES,
     EnergyPeriod,
     HolidayMode,
     PresetMode,
@@ -246,6 +247,22 @@ class FenixControlClient:
 
     async def set_target_temperature(self, device_id: str, celsius: float) -> None:
         """Set the target temperature (°C); switches the device to manual."""
+        await self.set_setpoint(device_id, PresetMode.MANUAL, celsius)
+
+    async def set_setpoint(
+        self, device_id: str, mode: PresetMode | int, celsius: float
+    ) -> None:
+        """Switch to ``mode`` and set that mode's setpoint (°C).
+
+        Manual, Defrost and Boost each have their own setpoint (``Ma``, ``df``,
+        ``bo``). The cloud doesn't check the device's range (see
+        ``Device.*_range``); callers should.
+        """
+        try:
+            code = SETPOINT_CODES[PresetMode(mode)]
+        except (KeyError, ValueError) as err:
+            msg = f"Preset mode without a setpoint: {mode}"
+            raise ValueError(msg) from err
         await self._put(
             _CONFIG_REPLACE_PATH,
             {
@@ -253,8 +270,8 @@ class FenixControlClient:
                 "S1": device_id,
                 "configurationVersion": "v1.0",
                 "data": [
-                    {"wattsType": "Dm", "wattsTypeValue": int(PresetMode.MANUAL)},
-                    {"wattsType": "Ma", "wattsTypeValue": encode_temperature(celsius)},
+                    {"wattsType": "Dm", "wattsTypeValue": int(mode)},
+                    {"wattsType": code, "wattsTypeValue": encode_temperature(celsius)},
                 ],
             },
         )
