@@ -21,6 +21,9 @@ All notable changes to this project are documented here. The format follows
   Defrost or Boost and set that mode's setpoint. `set_target_temperature` is now
   `set_setpoint` with manual mode (same request as before).
 
+### Fixed
+- Temperatures with a malformed `divFactor` decode to `None` instead of raising.
+
 ## [0.3.0] - 2026-11-08
 
 ### Added

@@ -43,6 +43,8 @@ def _entry(value: object, div: int = 10) -> dict[str, object]:
         ({"value": None}, None),
         ({"value": True}, None),
         ({"value": "68"}, None),
+        ({"value": 680, "divFactor": "10"}, None),  # malformed divFactor
+        ({"value": 680, "divFactor": True}, None),
     ],
 )
 def test_decode_temperature(
@@ -230,6 +232,7 @@ def test_device_defrost_and_boost_temperature() -> None:
         ({"value": 680, "divFactor": 10, "min": 500}, None),
         ({"value": 680, "divFactor": 10, "min": 860, "max": 500}, None),
         ({"value": 680, "divFactor": 10, "min": "x", "max": 860}, None),
+        ({"value": 680, "divFactor": "10", "min": 500, "max": 860}, None),
     ],
 )
 def test_device_target_temperature_range(

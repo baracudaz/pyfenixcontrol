@@ -25,6 +25,8 @@ def decode_temperature(entry: Mapping[str, Any] | None) -> float | None:
     if not isinstance(value, int | float) or isinstance(value, bool):
         return None
     div = entry.get("divFactor") or 1
+    if not isinstance(div, int | float) or isinstance(div, bool):
+        return None
     fahrenheit = value / div
     return (fahrenheit - 32.0) * 5.0 / 9.0
 
