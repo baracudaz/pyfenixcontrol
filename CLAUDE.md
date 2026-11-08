@@ -78,5 +78,4 @@ why the cloud doesn't deliver `ft` for TFT thermostats.
 
 Bump `__version__` in `src/pyfenixcontrol/__init__.py`, update `CHANGELOG.md`,
 publish a GitHub release tagged `vX.Y.Z`; `release.yml` publishes to PyPI via
-trusted publishing. **Do not release to PyPI until the PyPI project owner is
-decided** (the repository may still move to a FENIX GitHub organization).
+trusted publishing.
