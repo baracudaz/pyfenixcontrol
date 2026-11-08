@@ -31,6 +31,13 @@ DEFAULT_MAX_RETRIES: Final = 2
 HOLIDAY_EPOCH_DATE: Final = "00/00/1970 00:00:00"
 HOLIDAY_DATE_FORMAT: Final = "%d/%m/%Y %H:%M:%S"
 
+#: Product names of the known device types (``Ty``).
+DEVICE_MODEL_NAMES: Final[dict[str, str]] = {
+    "P07542": "TFT Wi-Fi",
+    "P08639": "TFT Wi-Fi RF",
+    "P08681": "WiFi Box",
+}
+
 #: Divisor applied to raw temperature values when none is given by the API.
 DEFAULT_DIV_FACTOR: Final = 10
 
