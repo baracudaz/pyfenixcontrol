@@ -213,9 +213,8 @@ def test_device_defrost_and_boost_temperature() -> None:
     assert device.defrost_temperature == pytest.approx(7.0)
     assert device.boost_temperature == pytest.approx(24.0)
 
-    assert device.defrost_temperature_range == pytest.approx(
-        ((35.5 - 32) * 5 / 9, 15.0)
-    )
+    # raw 355-590 = 35.5-59 °F
+    assert device.defrost_temperature_range == pytest.approx((1.94, 15.0), abs=0.01)
     assert device.boost_temperature_range == pytest.approx((5.0, 35.0))
 
     empty = Device.from_api("dev-1", {}, inst, inst.rooms[0])
