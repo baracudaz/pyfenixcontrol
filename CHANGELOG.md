@@ -8,7 +8,7 @@ All notable changes to this project are documented here. The format follows
 
 ### Fixed
 - `Device.floor_temperature` is read from `ft`; it was read from `bo`, which
-  holds a different value.
+  holds the boost setpoint. Devices that don't report `ft` get `None`.
 
 ### Changed
 - README: clarify relationship with FENIX Trading s.r.o.

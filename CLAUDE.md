@@ -64,14 +64,15 @@ tests/             run against FakeCloud (local aiohttp server), no real account
 ## API field reference (device twin keys)
 
 `Cm` preset mode · `Dm` preset mode (write) · `Hs` heating state (holiday mode while
-in holiday) · `Ma` target · `At` room · `bo` floor · `Sp` holiday target ·
+in holiday) · `Ma` target · `At` room · `ft` floor (not sent by any TFT Wi-Fi tested
+so far, even with a floor probe connected) · `bo` Boost setpoint (never use it as
+the floor) · `df` frost-protection setpoint · `Sp` active setpoint ·
 `H1`/`H2` holiday start/end (`dd/mm/YYYY HH:MM:SS`, sentinel `00/00/1970 00:00:00`) ·
 `H3[0]` scheduled holiday mode · `H4` active holiday mode · `Rn` name · `Sv`
 firmware · `Ty` type. Temperatures are °F × `divFactor`.
 
-Open questions with the vendor (do not guess, keep current behaviour until answered):
-floor temperature `Ft` vs `bo`; whether `connectionState` is exposed via APIM;
-units of signal strength `Dc`; whether third parties may send `Uc` (refresh).
+Open question with the vendor (do not guess, keep current behaviour until answered):
+why the cloud doesn't deliver `ft` for TFT thermostats.
 
 ## Releasing
 
