@@ -6,6 +6,13 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-11-08
+
+### Added
+- `Device.active_target_temperature`: the setpoint the thermostat currently regulates
+  to (`Sp`: manual, program, Defrost, Boost or holiday setpoint); `None` for the
+  placeholder values reported in off mode.
+
 ## [0.2.0] - 2026-11-08
 
 ### Added

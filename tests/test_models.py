@@ -178,6 +178,28 @@ def test_device_model_name(device_type: str | None, expected: str | None) -> Non
     assert device.model_name == expected
 
 
+@pytest.mark.parametrize(
+    ("entry", "expected"),
+    [
+        ({"value": 680, "divFactor": 10, "min": 410, "max": 950}, 20.0),
+        ({"value": 446, "divFactor": 10}, 7.0),
+        ({"value": 0, "divFactor": 10, "min": 410, "max": 950}, None),  # TFT off
+        ({"value": 32767, "divFactor": 10}, None),  # WiFi Box off
+        ({"value": 400, "divFactor": 10, "min": 410, "max": 950}, None),
+        ({"value": 960, "divFactor": 10, "min": 410, "max": 950}, None),
+        (None, None),
+    ],
+)
+def test_device_active_target_temperature(
+    entry: dict[str, object] | None, expected: float | None
+) -> None:
+    """The active setpoint comes from Sp; off-mode placeholders give None."""
+    inst = Installation.from_api(INSTALLATION_JSON)
+    props = {} if entry is None else {"Sp": entry}
+    device = Device.from_api("dev-1", props, inst, inst.rooms[0])
+    assert device.active_target_temperature == pytest.approx(expected)
+
+
 def test_energy_metric_from_api() -> None:
     metric = EnergyMetric.from_api(
         {
