@@ -6,6 +6,14 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-11-09
+
+### Changed
+- `Device.name` falls back to the room's name when the device doesn't report its
+  own (`Rn` missing or empty, seen on a thermostat after firmware v01.09.03), as
+  the FENIX app does. Integrations no longer need to patch it. `None` only if
+  neither has a name.
+
 ## [0.4.0] - 2026-11-08
 
 ### Added

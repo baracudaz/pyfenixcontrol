@@ -166,6 +166,8 @@ class Device:
       ``H4`` - currently active holiday mode (primary holiday indicator)
     * ``Ma`` - target, ``At`` - room, ``ft`` - floor, ``Sp`` - active setpoint
       (also during a holiday), ``df`` - Defrost setpoint, ``bo`` - Boost setpoint
+    * ``Rn`` - name; when the device doesn't report one (seen after firmware
+      v01.09.03), ``name`` is the room's name, as in the FENIX app
     """
 
     id: str
@@ -212,10 +214,11 @@ class Device:
         """Build from the device twin ``content`` properties."""
         h3 = _prop(props, "H3")
         holiday_mode = _as_int(h3[0]) if isinstance(h3, list) and h3 else None
-        name = _prop(props, "Rn")
+        # Some thermostats stop reporting their own name; the room keeps it
+        name = _as_str(_prop(props, "Rn")) or room.name
         return cls(
             id=device_id,
-            name=_as_str(name),
+            name=name,
             installation_id=installation.id,
             installation_name=installation.name,
             room_id=room.id,
