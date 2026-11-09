@@ -133,7 +133,7 @@ def test_device_from_api_sparse() -> None:
         inst,
         inst.rooms[1],
     )
-    assert device.name is None
+    assert device.name is None  # room-2 has no name either
     assert device.model is None
     assert device.target_temperature is None
     assert device.preset_mode == 6
@@ -142,6 +142,25 @@ def test_device_from_api_sparse() -> None:
     assert device.active_holiday_mode == 0
     assert not device.holiday_active
     assert device.holiday_end_date is None
+
+
+@pytest.mark.parametrize(
+    ("props", "room_index", "expected"),
+    [
+        ({"Rn": {"value": "Bathroom"}}, 0, "Bathroom"),
+        ({}, 0, "Living"),  # no Rn: the room's name
+        ({"Rn": {"value": ""}}, 0, "Living"),
+        ({}, 1, None),  # neither the device nor the room has a name
+    ],
+    ids=["own-name", "room-name", "empty-name", "no-name"],
+)
+def test_device_name_falls_back_to_room(
+    props: dict[str, object], room_index: int, expected: str | None
+) -> None:
+    """A device without its own name is named after its room."""
+    inst = Installation.from_api(INSTALLATION_JSON)
+    device = Device.from_api("dev-1", props, inst, inst.rooms[room_index])
+    assert device.name == expected
 
 
 @pytest.mark.parametrize(

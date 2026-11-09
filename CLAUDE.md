@@ -68,7 +68,7 @@ in holiday) · `Ma` target · `At` room · `ft` floor (not sent by any TFT Wi-Fi
 so far, even with a floor probe connected) · `bo` Boost setpoint (never use it as
 the floor) · `df` frost-protection setpoint · `Sp` active setpoint ·
 `H1`/`H2` holiday start/end (`dd/mm/YYYY HH:MM:SS`, sentinel `00/00/1970 00:00:00`) ·
-`H3[0]` scheduled holiday mode · `H4` active holiday mode · `Rn` name · `Sv`
+`H3[0]` scheduled holiday mode · `H4` active holiday mode · `Rn` name (`Device.name` falls back to the room name) · `Sv`
 firmware · `Ty` type. Temperatures are °F × `divFactor`.
 
 Open question with the vendor (do not guess, keep current behaviour until answered):
