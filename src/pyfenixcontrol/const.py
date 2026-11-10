@@ -38,6 +38,13 @@ DEVICE_MODEL_NAMES: Final[dict[str, str]] = {
     "P08681": "WiFi Box",
 }
 
+#: Device types without a floor temperature: the WiFi Box sends ``ft``, but it
+#: means nothing there.
+MODELS_WITHOUT_FLOOR_TEMPERATURE: Final = frozenset({"P08681"})
+
+#: Raw temperature values that mark "no value" (error or placeholder).
+TEMPERATURE_ERROR_VALUES: Final = frozenset({0x7FFF, 0xFFFF})
+
 #: Divisor applied to raw temperature values when none is given by the API.
 DEFAULT_DIV_FACTOR: Final = 10
 

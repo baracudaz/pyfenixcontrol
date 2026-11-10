@@ -45,6 +45,8 @@ def _entry(value: object, div: int = 10) -> dict[str, object]:
         ({"value": "68"}, None),
         ({"value": 680, "divFactor": "10"}, None),  # malformed divFactor
         ({"value": 680, "divFactor": True}, None),
+        (_entry(0x7FFF), None),  # error value
+        (_entry(0xFFFF), None),
     ],
 )
 def test_decode_temperature(
@@ -169,8 +171,20 @@ def test_device_name_falls_back_to_room(
         ({"ft": _entry(770)}, 25.0),
         ({}, None),
         ({"bo": _entry(716)}, None),
+        ({"ft": _entry(0x7FFF)}, None),
+        ({"ft": _entry(0xFFFF)}, None),
+        ({"ft": _entry(718), "Ty": {"value": "P08681"}}, None),
+        ({"ft": _entry(770), "Ty": {"value": "P08639"}}, 25.0),
     ],
-    ids=["ft-present", "ft-missing", "bo-without-ft"],
+    ids=[
+        "ft-present",
+        "ft-missing",
+        "bo-without-ft",
+        "ft-error-7fff",
+        "ft-error-ffff",
+        "wifi-box",
+        "tft-rf",
+    ],
 )
 def test_device_floor_temperature(
     props: dict[str, object], expected: float | None
