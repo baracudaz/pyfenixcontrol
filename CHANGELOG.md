@@ -6,6 +6,14 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-11-10
+
+### Fixed
+- Temperatures with the raw error value 0x7FFF (or 0xFFFF) decode to `None` instead
+  of an absurd temperature. Watts uses 0x7FFF for "no value".
+- `Device.floor_temperature` is `None` on the WiFi Box (`P08681`): it sends `ft`,
+  but the value means nothing there (no floor probe).
+
 ## [0.5.0] - 2026-11-09
 
 ### Changed

@@ -11,6 +11,8 @@ from .const import (
     DEVICE_MODEL_NAMES,
     HOLIDAY_DATE_FORMAT,
     HOLIDAY_EPOCH_DATE,
+    MODELS_WITHOUT_FLOOR_TEMPERATURE,
+    TEMPERATURE_ERROR_VALUES,
 )
 
 if TYPE_CHECKING:
@@ -23,6 +25,8 @@ def decode_temperature(entry: Mapping[str, Any] | None) -> float | None:
         return None
     value = entry.get("value")
     if not isinstance(value, int | float) or isinstance(value, bool):
+        return None
+    if value in TEMPERATURE_ERROR_VALUES:
         return None
     div = entry.get("divFactor") or 1
     if not isinstance(div, int | float) or isinstance(div, bool):
@@ -216,6 +220,12 @@ class Device:
         holiday_mode = _as_int(h3[0]) if isinstance(h3, list) and h3 else None
         # Some thermostats stop reporting their own name; the room keeps it
         name = _as_str(_prop(props, "Rn")) or room.name
+        model = None if _prop(props, "Ty") is None else str(_prop(props, "Ty"))
+        floor = (
+            None
+            if model in MODELS_WITHOUT_FLOOR_TEMPERATURE
+            else decode_temperature(props.get("ft"))
+        )
         return cls(
             id=device_id,
             name=name,
@@ -223,10 +233,10 @@ class Device:
             installation_name=installation.name,
             room_id=room.id,
             software_version=_as_str(_prop(props, "Sv")),
-            model=None if _prop(props, "Ty") is None else str(_prop(props, "Ty")),
+            model=model,
             target_temperature=decode_temperature(props.get("Ma")),
             room_temperature=decode_temperature(props.get("At")),
-            floor_temperature=decode_temperature(props.get("ft")),
+            floor_temperature=floor,
             holiday_target_temperature=decode_temperature(props.get("Sp")),
             preset_mode=_as_int(_prop(props, "Cm")),
             hvac_state=_as_int(_prop(props, "Hs")),
