@@ -1,5 +1,11 @@
 # pyfenixcontrol
 
+[![PyPI Downloads](https://static.pepy.tech/personalized-badge/pyfenixcontrol?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/pyfenixcontrol)
+[![PyPI](https://img.shields.io/pypi/v/pyfenixcontrol)](https://pypi.org/project/pyfenixcontrol/)
+[![Python versions](https://img.shields.io/pypi/pyversions/pyfenixcontrol)](https://pypi.org/project/pyfenixcontrol/)
+[![CI](https://github.com/baracudaz/pyfenixcontrol/actions/workflows/ci.yml/badge.svg)](https://github.com/baracudaz/pyfenixcontrol/actions/workflows/ci.yml)
+[![License](https://img.shields.io/pypi/l/pyfenixcontrol)](LICENSE)
+
 Asynchronous Python client for the **FENIX Control** cloud, used by FENIX TFT WiFi
 thermostats. It powers the FENIX integration for [Home Assistant](https://www.home-assistant.io/),
 but has no Home Assistant dependency and can be used from any asyncio code.
